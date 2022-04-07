@@ -64,7 +64,7 @@ builder.Services.AddHangfireServer(options =>
 builder.Services.AddScoped<IHangfireJobTrigger, HangfireJobTrigger>();
 builder.Services.AddScoped<ISystemJob, SystemJob>();
 
-// Hangfire Console »P Commom Logger ¾ã¦X
+// Hangfire Console èˆ‡ Commom Logger æ•´åˆ
 builder.Services.AddHangfireConsoleExtensions();
 
 var app = builder.Build();
