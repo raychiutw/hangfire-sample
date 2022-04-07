@@ -1,6 +1,6 @@
 # hangfire-sample
 
-## Why Hangfire
+## Why to Use Hangfire
 
 ### Queue-based Processing
 
@@ -44,7 +44,6 @@ BackgroundJob.Enqueue(() => GenerateStatistics());
 Hangfire was made with the knowledge that the hosting environment can kill all the threads on each line. So, it does not remove the job until it is successfully completed and contains different implicit retry logic to do the job when its processing was aborted.
 
 ### Instance Method Calls
-All the examples above uses static method invocation, but instance methods are supported as well:
 
 ```c#
 public class EmailService
@@ -55,9 +54,13 @@ public class EmailService
 BackgroundJob.Enqueue<EmailService>(x => x.Send());
 ```
 
-When a worker sees that the given method is an instance-method, it will activate its class first. By default, the Activator.CreateInstance method is used, so only classes with default constructors are supported by default. But you can plug in your IoC container and pass the dependencies through the constructor.
+When a worker sees that the given method is an instance-method, it will activate its class first. By default, the `Activator.CreateInstance` method is used, so only classes with default constructors are supported by default. But you can plug in your IoC container and pass the dependencies through the constructor.
 
 ### Culture Capturing
+
+When you marshal your method invocation into another execution context, you should be able to preserve some environment settings. Some of them – `Thread.CurrentCulture` and `Thread.CurrentUICulture` are automatically captured for you.
+
+It is done by the `PreserveCultureAttribute` class that is applied to all of your methods by default.
 
 ### Cancellation Tokens
 Hangfire can tell your methods were aborted or canceled due to shutdown event, so you can stop them gracefully using job cancellation tokens that are similar to the regular CancellationToken class.
@@ -75,11 +78,19 @@ public void Method(CancellationToken token)
 
 ### IoC Containers
 
+- Hangfire.Ninject
+- Hangfire.Autofac
+
 ### Logging
+
+Hangfire uses the Common.Logging library to log all its events
 
 ### Web Garden- and Web Farm-friendly
 
+You can run multiple Hangfire instances, either on the same or different machines. It uses distributed locking to prevent race conditions. Each Hangfire instance is redundant, and you can add or remove instances seamlessly (but control the queues they listen).
+
 ### Multiple Queue Processing
+
 Hangfire can process multiple queues. If you want to prioritize your jobs or split the processing across your servers (some processes the archive queue, others – the images queue, etc), you can tell Hangfire about your decisions.
 
 To place a job into a different queue, use the QueueAttribute class on your method:
@@ -93,28 +104,38 @@ BackgroundJob.Enqueue(() => SomeMethod());
 
 To start to process multiple queues, you need to update your OWIN bootstrapper’s configuration action:
 
+```c#
 services.AddHangfireServer(options => options.Queues = new [] { "critical", "default" });
+```
+
 The order is important, workers will fetch jobs from the critical queue first, and then from the default queue.
 
-Concurrency Level Control
+### Concurrency Level Control
+
 Hangfire uses its own fixed worker thread pool to consume queued jobs. Default worker count is set to Environment.ProcessorCount * 5. This number is optimized both for CPU-intensive and I/O intensive tasks. If you experience excessive waits or context switches, you can configure the amount of workers manually:
 
+```c#
 services.AddHangfireServer(options => options.WorkerCount = 100);
+```
+
 Process Jobs Anywhere
 By default, the job processing is made within an ASP.NET application. But you can process jobs either in a console application, Windows Service, or anywhere else.
 
 ### Extensibility
 Hangfire is built to be as generic as possible. You can extend the following parts:
 
-### storage implementation;
-states subsystem (including the creation of new states);
-job creation process;
-job performance process;
-state changing process;
-job activation process.
+- storage implementation;
+- states subsystem (including the creation of new states);
+- job creation process;
+- job performance process;
+- state changing process;
+- job activation process.
+
 Some of core components are made as extensions: QueueAttribute, PreserveCultureAttribute, AutomaticRetryAttribute, SqlServerStorage, RedisStorage, NinjectJobActivator, AutofacJobActivator, ScheduledState.
 
 Did you know that you can edit this page on GitHub and send a Pull Request?
+
+## How to Use Hangfire
 
 ### 安裝套件
 
