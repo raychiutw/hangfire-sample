@@ -16,6 +16,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHangfire(config =>
     config.UseMemoryStorage()
         .WithJobExpirationTimeout(TimeSpan.FromDays(3))
+        .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseRecommendedSerializerSettings()
         .UseConsole()
         .UseNLogLogProvider());
 
@@ -37,7 +40,8 @@ builder.Services.AddHangfire(config =>
 //                //SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
 //                QueuePollInterval = TimeSpan.Zero,
 //                UseRecommendedIsolationLevel = true,
-//                DisableGlobalLocks = true // Migration to Schema 7 is required
+//                DisableGlobalLocks = true, // Migration to Schema 7 is required
+//                EnableHeavyMigrations = false
 //            })
 //        .WithJobExpirationTimeout(TimeSpan.FromDays(3))
 //        .UseConsole()
