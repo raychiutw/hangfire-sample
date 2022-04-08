@@ -371,3 +371,10 @@ builder.Services.AddHangfire(config =>
         .UseConsole()
         .UseNLogLogProvider());
 ```
+
+## SQL Server sql
+
+[install.sql](sqlserver/install.sql)
+
+參考路徑
+https://github.com/HangfireIO/Hangfire/blob/master/src/Hangfire.SqlServer/Install.sql
